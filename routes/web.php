@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,21 +25,16 @@ Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(
 //email verificaiton
 
 //email link sent for verification
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/home');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}',[HomeController::class,'verify'])->middleware(['auth', 'signed'])->name('verification.verify');
 
-//email verify notice 
-Route::get('/email/notice', function () {
-    $auth = Auth::user()->email_verified_at;
-    if($auth != null){
-        return redirect('/home');
-    }
-    return view('auth.verify');
-})->middleware('auth')->name('verification.notice');
+//email verify notice about verification link sent
+Route::get('/email/notice',[HomeController::class,'verify_notice'])->middleware('auth')->name('verification.notice');
 
 //email verify link resend -> link
-Route::get('/email/resend', function () {
-    return view('auth.verify');
-})->middleware('auth')->name('verification.resend');
+Route::get('/email/resend', [HomeController::class,'verify_resend'])->middleware('auth')->name('verification.resend');
+
+//change password view
+Route::get('/view/change/password',[HomeController::class,'change_password_view'])->middleware(['verified','auth'])->name('change.password');
+//update Password
+Route::post('/password/updated',[HomeController::class,'update_password'])->middleware(['auth','verified'])->name('update.password');
+
