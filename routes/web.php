@@ -25,12 +25,13 @@ Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(['auth','verified']);
 //email verificaiton
 
-
+//email link sent for verification
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
     return redirect('/home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
+//email verify notice 
 Route::get('/email/notice', function () {
     $auth = Auth::user()->email_verified_at;
     if($auth != null){
@@ -39,6 +40,7 @@ Route::get('/email/notice', function () {
     return view('auth.verify');
 })->middleware('auth')->name('verification.notice');
 
+//email verify link resend -> link
 Route::get('/email/resend', function () {
     return view('auth.verify');
 })->middleware('auth')->name('verification.resend');
